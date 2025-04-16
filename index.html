@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .cart-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+        .cart-item img {
+            width: 50px;
+            height: 50px;
+        }
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .quantity-controls button {
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .quantity-controls span {
+            width: 30px;
+            text-align: center;
+        }
+        .like-button {
+            cursor: pointer;
+            font-size: 20px;
+        }
+        .like-button.liked {
+            color: red;
+        }
+        .delete-button {
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .total-price {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <h1>Shopping Cart</h1>
+    <div id="cart">
+        <!-- Cart items will be dynamically populated -->
+    </div>
+    <div class="total-price" id="totalPrice">Total: $0.00</div>
+
+    <script>
+        // Preselected cart items
+        const cartItems = [
+            { id: 1, name: 'Laptop', price: 999.99, quantity: 1, liked: false, image: 'https://via.placeholder.com/50' },
+            { id: 2, name: 'Headphones', price: 79.99, quantity: 2, liked: false, image: 'https://via.placeholder.com/50' },
+            { id: 3, name: 'Mouse', price: 29.99, quantity: 1, liked: false, image: 'https://via.placeholder.com/50' }
+        ];
+
+        // Function to render cart items
+        function renderCart() {
+            const cartContainer = document.getElementById('cart');
+            cartContainer.innerHTML = '';
+
+            cartItems.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'cart-item';
+                itemElement.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}">
+                    <span>${item.name}</span>
+                    <span>$${item.price.toFixed(2)}</span>
+                    <div class="quantity-controls">
+                        <button onclick="updateQuantity(${item.id}, -1)">-</button>
+                        <span>${item.quantity}</span>
+                        <button onclick="updateQuantity(${item.id}, 1)">+</button>
+                    </div>
+                    <span class="like-button ${item.liked ? 'liked' : ''}" onclick="toggleLike(${item.id})">&#9829;</span>
+                    <button class="delete-button" onclick="deleteItem(${item.id})">Delete</button>
+                `;
+                cartContainer.appendChild(itemElement);
+            });
+
+            updateTotalPrice();
+        }
+
+        // Function to update quantity
+        function updateQuantity(id, change) {
+            const item = cartItems.find(item => item.id === id);
+            if (item) {
+                item.quantity = Math.max(1, item.quantity + change); // Prevent quantity < 1
+                renderCart();
+            }
+        }
+
+        // Function to toggle like
+        function toggleLike(id) {
+            const item = cartItems.find(item => item.id === id);
+            if (item) {
+                item.liked = !item.liked;
+                renderCart();
+            }
+        }
+
+        // Function to delete item
+        function deleteItem(id) {
+            const index = cartItems.findIndex(item => item.id === id);
+            if (index !== -1) {
+                cartItems.splice(index, 1);
+                renderCart();
+            }
+        }
+
+        // Function to update total price
+        function updateTotalPrice() {
+            const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            document.getElementById('totalPrice').textContent = `Total: $${total.toFixed(2)}`;
+        }
+
+        // Initial render
+        renderCart();
+    </script>
+</body>
+</html>
